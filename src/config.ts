@@ -2,10 +2,10 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-export type Config = {
+
+type Config = {
   dbUrl: string;
   currentUserName: string;
-  connectionString: string;
 };
 
 export function setUser(userName: string) {
@@ -18,13 +18,9 @@ function validateConfig(rawConfig: any) {
   if (!rawConfig.db_url || typeof rawConfig.db_url !== "string") {
     throw new Error("db_url is required in config file");
   }
-  if (!rawConfig.connection_string || typeof rawConfig.connection_string !== "string") {
-    throw new Error("connection_string is required in config file");
-  }
   const config: Config = {
     dbUrl: rawConfig.db_url,
     currentUserName: rawConfig.current_user_name ?? "",
-    connectionString: rawConfig.connection_string ?? "",
   };
 
   return config;
@@ -51,7 +47,6 @@ function writeConfig(config: Config) {
   const rawConfig = {
     db_url: config.dbUrl,
     current_user_name: config.currentUserName,
-    connection_string: config.connectionString,
   };
 
   const data = JSON.stringify(rawConfig, null, 2);
