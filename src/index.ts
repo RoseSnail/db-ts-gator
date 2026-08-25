@@ -9,10 +9,16 @@ import {
   handlerRegister,
 } from "./commands/users";
 import { handlerReset } from "./commands/reset";
-import { handlerAgg } from "./commands/fetch";
+import { addFeed, handlerAgg } from "./commands/fetch";
 
 async function main() {
   const args = process.argv.slice(2);
+
+
+  // tester function
+  //const response = await addFeed('nameString', 'urlString');
+  //await addFeed('nameString', 'urlString');
+  
 
   if (args.length < 1) {
     console.log("usage: cli <command> [args...]");
@@ -27,7 +33,7 @@ async function main() {
   registerCommand(commandsRegistry, "register", handlerRegister);
   registerCommand(commandsRegistry, "reset", handlerReset);
   registerCommand(commandsRegistry, "users", handlerListUsers);
-  registerCommand(commandsRegistry, "agg", handlerAgg);
+  registerCommand(commandsRegistry, "addfeed", handlerAgg);
 
   try {
     await runCommand(commandsRegistry, cmdName, ...cmdArgs);

@@ -1,6 +1,12 @@
 import { XMLParser } from "fast-xml-parser";
+import { readConfig } from "src/config";
+import { createFeed } from "src/lib/db/queries/feeds";
+import { getUser } from "src/lib/db/queries/users";
+import { feeds, users } from "src/lib/db/schema";
 
 
+export type DbFeed = typeof feeds.$inferSelect; // feeds is the table object in schema.ts
+export type DbUser = typeof users.$inferSelect; // users is the table object in schema.ts
 
 type RSSFeed = {
   channel: {
@@ -19,11 +25,12 @@ type RSSItem = {
 };
 
 
-export async function handlerAgg(_: string) {
-  const response = await fetchFeed('default');
-  //console.log("Feed fetched");
-  console.log(response);
-  console.log(response?.channel.item);
+export async function handlerAgg(cmdName: string, ...args: string[]) {
+  console.log("Hit HandlerAgg");
+  if (args.length !== 2) {
+    throw new Error(`usage: ${cmdName} <name> <url>`);
+  }
+  await addFeed(args[0], args[1]);
 }
 
 export async function fetchFeed(feedURL:string){
@@ -95,12 +102,37 @@ export async function fetchFeed(feedURL:string){
           return rssFeedObj;
 
         } else if ('item' in rss.channel && typeof(rss.channel.item) === 'object') {
-          //console.log("channel.item is an Object");
+          return rssFeedObj;
         } else {
-          //console.log("Who knows what the channel.item is, or if it even exists");
+          console.log("Who knows what the channel.item is, or if it even exists");
+          throw Error("channel feed does not have items");
         }
       }
     }
   }
-  return undefined;
+  throw Error("Failed parsing or feed does not have 'rss'");
+}
+
+export async function addFeed(name: string, url: string) {
+  console.log("Hit addFeed");
+  const configUser = await readConfig().currentUserName;
+  const currentDbUser = await getUser(configUser);
+  if (currentDbUser == undefined) {
+    throw Error("Current User not found in the database!");
+  }
+  //console.log(`currentDbUser`);
+  //console.log(currentDbUser);
+  
+  const feedResponse = await fetchFeed(url);
+  //console.log("Feed fetched");
+  //console.log(feedResponse);
+  //console.log(feedResponse.channel.item);
+
+  const createdFeed = await createFeed(name, url, currentDbUser.id);
+  await printFeed(createdFeed, currentDbUser);
+}
+
+async function printFeed(feed: DbFeed, user: DbUser) {
+  console.log("Hit printFeed");
+  console.log(feed);
 }
