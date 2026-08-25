@@ -23,6 +23,11 @@ export async function createFeed(
   }
 }
 
+//SELECT * FROM feeds;
+export async function getFeeds() {
+  return db.select().from(feeds);
+}
+
 
 export async function deleteFeeds() {
   await db.delete(feeds);

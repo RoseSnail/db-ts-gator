@@ -1,6 +1,6 @@
 import { readConfig } from "src/config";
-import { createFeed } from "../lib/db/queries/feeds";
-import { getUser } from "../lib/db/queries/users";
+import { createFeed, getFeeds } from "../lib/db/queries/feeds";
+import { getUser, getUsers } from "../lib/db/queries/users";
 import { Feed, User } from "src/lib/db/schema";
 
 export async function handlerAddFeed(cmdName: string, ...args: string[]) {
@@ -34,4 +34,23 @@ function printFeed(feed: Feed, user: User) {
   console.log(`* name:          ${feed.name}`);
   console.log(`* URL:           ${feed.url}`);
   console.log(`* User:          ${user.name}`);
+}
+
+export async function handlerListFeeds(_: string) {
+  const users = await getUsers();
+  const userIdName: Record<string, string> = {};
+  for (const user of users) {
+    userIdName[user.id] = user.name;
+  }
+
+  const feeds = await getFeeds();
+  for (const feed of feeds) {
+    //console.log(`* ID:            ${feed.id}`);
+    //console.log(`* Created:       ${feed.createdAt}`);
+    //console.log(`* Updated:       ${feed.updatedAt}`);
+    //console.log(`* name:          ${feed.name}`);
+    //console.log(`* URL:           ${feed.url}`);
+    //console.log(`* User:          ${userIdName[feed.userId]}`);
+    console.log(`(${feed.id}) * "${feed.name}" * ${feed.url} * ${userIdName[feed.userId]}`);
+  }
 }
