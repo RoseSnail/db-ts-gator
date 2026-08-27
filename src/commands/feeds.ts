@@ -1,7 +1,7 @@
 import { readConfig } from "src/config";
 import { createFeed, getFeeds } from "../lib/db/queries/feeds";
 import { getUser, getUsers } from "../lib/db/queries/users";
-import { Feed, User } from "src/lib/db/schema";
+import { DbFeed, DbUser } from "src/lib/db/schema";
 
 export async function handlerAddFeed(cmdName: string, ...args: string[]) {
   if (args.length !== 2) {
@@ -27,7 +27,7 @@ export async function handlerAddFeed(cmdName: string, ...args: string[]) {
   printFeed(feed, user);
 }
 
-function printFeed(feed: Feed, user: User) {
+function printFeed(feed: DbFeed, user: DbUser) {
   console.log(`* ID:            ${feed.id}`);
   console.log(`* Created:       ${feed.createdAt}`);
   console.log(`* Updated:       ${feed.updatedAt}`);

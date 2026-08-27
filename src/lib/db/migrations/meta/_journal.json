@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1787612396688,
-      "tag": "0000_unusual_lyja",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1787628234823,
-      "tag": "0001_demonic_blockbuster",
+      "when": 1787857524063,
+      "tag": "0000_jazzy_hydra",
       "breakpoints": true
     }
   ]
