@@ -10,10 +10,16 @@ export async function createUser(name: string) {
   return result;
 }
 
-//SELECT * FROM users WHERE name '=' input;
-export async function getUser(name: string) {
-  const result = await db.select().from(users).where(eq(users.name, name));
-  return firstOrUndefined(result);
+//SELECT * FROM users WHERE name '=' input (or id '=' input);;
+export async function getUser(name: string|null, id:string = "") {
+  if (name != null) {
+    const result = await db.select().from(users).where(eq(users.name, name));
+    return firstOrUndefined(result);
+  } else if (id != "") {
+    const idResult = await db.select().from(users).where(eq(users.id, id));
+    return firstOrUndefined(idResult);
+  }
+  throw Error("getUser() needs either a name or an id to be passed!");
 }
 
 export async function deleteUsers() {

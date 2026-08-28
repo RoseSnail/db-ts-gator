@@ -2,7 +2,7 @@ import { readConfig } from "src/config";
 import { getFeed } from "../lib/db/queries/feeds";
 import { getUser } from "../lib/db/queries/users";
 import { DbFeed, DbUser, DbFeedFollows } from "src/lib/db/schema";
-import { createFeedFollow } from "src/lib/db/queries/feed_follows";
+import { createFeedFollow, getFeedFollowsForUser } from "src/lib/db/queries/feed_follows";
 
 
 export async function handlerFollow(cmdName: string, ...args: string[]) {
@@ -23,8 +23,30 @@ export async function handlerFollow(cmdName: string, ...args: string[]) {
   }
 
   const feedFollowUserAndFeed = await createFeedFollow(user.id, feed.id);
-  
-  console.log(`* Successfully Followed *`);
-  console.log(`* Feed name:     ${feed.name}`);
-  console.log(`* Current User:  ${user.name}`);
+  if (feedFollowUserAndFeed) {
+    console.log(`* Successfully Followed *`);
+    console.log(`* Feed name:     ${feedFollowUserAndFeed.feedName}`);
+    console.log(`* Current User:  ${feedFollowUserAndFeed.userName}`);
+  } else {
+    throw new Error(`New FeedFollow of ${url} for ${user.name} failed to be created`);
+  }
+}
+
+export async function handlerFollowing(cmdName: string) {
+  const config = readConfig();
+  const user = await getUser(config.currentUserName);
+  if (!user) {
+    throw new Error(`User ${config.currentUserName} not found`);
+  }
+
+  const feedFollows = await getFeedFollowsForUser(user.name);
+  //console.log(feedFollows);
+  if (!feedFollows || feedFollows.length < 1) {
+    console.log(`No follows found for ${user.name}`);
+  } else {
+    console.log(`* ${user.name} Currently Follows *`);
+    for (const feed of feedFollows) {
+      console.log(`* ${feed.feedName}`);
+    }
+  }
 }
