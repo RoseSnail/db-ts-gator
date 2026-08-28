@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "..";
-import { feedFollows, feeds } from "../schema";
+import { feeds } from "../schema";
 import { firstOrUndefined } from "./utils";
 import { createFeedFollow } from "./feed_follows";
 
@@ -47,9 +47,27 @@ export async function deleteFeeds() {
   await db.delete(feeds);
 }
 
-//export async function getFeedFollowsForUser(userId: string) {
-//  const result = await db.select()
-//    .from(feedFollows)
-//    .where(eq(feedFollows.userId, userId));
-//  return result;
-//}
+export async function markFeedFetched(url:string|null, id:string = "") {
+  if (url != null) {
+    const result = await db.update(feeds)
+      .set({ lastFetchedAt: new Date() })
+      .where(eq(feeds.url, url))
+      .returning();
+    return firstOrUndefined(result);
+  } else if (id != "") {
+    const idResult = await db.update(feeds)
+      .set({ lastFetchedAt: new Date() })
+      .where(eq(feeds.id, id))
+      .returning();
+    return firstOrUndefined(idResult);
+  } else {
+    throw Error("markFeedFetched() needs either a url or an id to be passed!");
+  }
+}
+
+export async function getNextFeedToFetch() {
+  const result = await db.select().from(feeds).orderBy(sql`${feeds.lastFetchedAt} ASC NULLS FIRST`).limit(1);
+  //console.log(`getNextFeedToFetch()`);
+  //console.log(result);
+  return firstOrUndefined(result);
+}
