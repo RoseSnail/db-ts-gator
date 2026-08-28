@@ -1,6 +1,5 @@
-import { readConfig } from "src/config";
 import { createFeed, getFeeds } from "../lib/db/queries/feeds";
-import { getUser, getUsers } from "../lib/db/queries/users";
+import { getUsers } from "../lib/db/queries/users";
 import { DbFeed, DbUser } from "src/lib/db/schema";
 
 export async function handlerAddFeed(cmdName: string, user: DbUser, ...args: string[]) {

@@ -1,8 +1,6 @@
-import { readConfig } from "src/config";
 import { getFeed } from "../lib/db/queries/feeds";
-import { getUser } from "../lib/db/queries/users";
-import { DbFeed, DbUser, DbFeedFollows } from "src/lib/db/schema";
-import { createFeedFollow, getFeedFollowsForUser } from "src/lib/db/queries/feed_follows";
+import { DbUser } from "src/lib/db/schema";
+import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from "src/lib/db/queries/feed_follows";
 
 
 export async function handlerFollow(cmdName: string, user: DbUser, ...args: string[]) {
@@ -37,4 +35,13 @@ export async function handlerFollowing(cmdName: string, user:DbUser) {
       console.log(`* ${feed.feedName}`);
     }
   }
+}
+
+export async function handlerUnfollow(cmdName: string, user:DbUser, ...args: string[]) {
+  if (args.length !== 1) {
+    throw new Error(`usage: ${cmdName} <url>`);
+  }
+
+  await deleteFeedFollow(user.name, args[0]);
+  console.log(`${user.name} successfully unfollowed ${args[0]}`);
 }

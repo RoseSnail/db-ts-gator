@@ -58,16 +58,16 @@ export async function getFeedFollowFromId(
   throw Error("getFeedFollowFromId() needs either the feed_follows.id or the users.id and feeds.id to be passed!");
 }
 
-export async function getFeedFollowFromNames(
+export async function getFeedFollowFromNameUrl(
   userName: string,
-  feedName: string,
+  feedUrl: string,
 ) {
   const result = await db
     .select()
     .from(feedFollows)
     .where(and(
       eq(users.name, userName),
-      eq(feeds.name, feedName)))
+      eq(feeds.url, feedUrl)))
     .innerJoin(users, eq(users.id, feedFollows.userId))
     .innerJoin(feeds, eq(feeds.id, feedFollows.feedId));
   return firstOrUndefined(result)?.feed_follows;
@@ -106,4 +106,14 @@ export async function getFeedFollowsForUser(name:string|null, id:string = "") {
     return idResult;
   }
   throw Error("getFeedFollowsForUser() needs either a name or an id to be passed!");
+}
+
+export async function deleteFeedFollow(userName:string, feedUrl:string) {
+  const feedFollow = await getFeedFollowFromNameUrl(userName, feedUrl);
+
+  if (feedFollow != undefined) {
+    await db.delete(feedFollows).where(eq(feedFollows.id,feedFollow.id));
+  } else {
+    throw Error(`${userName} failed to unfollow ${feedUrl} for some reason.`);
+  }
 }
