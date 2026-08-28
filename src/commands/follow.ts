@@ -5,15 +5,9 @@ import { DbFeed, DbUser, DbFeedFollows } from "src/lib/db/schema";
 import { createFeedFollow, getFeedFollowsForUser } from "src/lib/db/queries/feed_follows";
 
 
-export async function handlerFollow(cmdName: string, ...args: string[]) {
+export async function handlerFollow(cmdName: string, user: DbUser, ...args: string[]) {
   if (args.length !== 1) {
     throw new Error(`usage: ${cmdName} <feed_url>`);
-  }
-
-  const config = readConfig();
-  const user = await getUser(config.currentUserName);
-  if (!user) {
-    throw new Error(`User ${config.currentUserName} not found`);
   }
 
   const url = args[0];
@@ -32,13 +26,7 @@ export async function handlerFollow(cmdName: string, ...args: string[]) {
   }
 }
 
-export async function handlerFollowing(cmdName: string) {
-  const config = readConfig();
-  const user = await getUser(config.currentUserName);
-  if (!user) {
-    throw new Error(`User ${config.currentUserName} not found`);
-  }
-
+export async function handlerFollowing(cmdName: string, user:DbUser) {
   const feedFollows = await getFeedFollowsForUser(user.name);
   //console.log(feedFollows);
   if (!feedFollows || feedFollows.length < 1) {

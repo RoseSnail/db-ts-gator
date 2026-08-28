@@ -1,3 +1,4 @@
+import { DbUser } from "src/lib/db/schema";
 
 
 
@@ -7,6 +8,13 @@ export type CommandHandler = (
 ) => Promise<void>;
 
 export type CommandsRegistry = Record<string, CommandHandler>;
+
+export type UserCommandHandler = (
+  cmdName: string,
+  user: DbUser,
+  ...args: string[]
+) => Promise<void> | void;
+
 
 export function registerCommand(
   registry: CommandsRegistry,

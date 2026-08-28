@@ -3,16 +3,9 @@ import { createFeed, getFeeds } from "../lib/db/queries/feeds";
 import { getUser, getUsers } from "../lib/db/queries/users";
 import { DbFeed, DbUser } from "src/lib/db/schema";
 
-export async function handlerAddFeed(cmdName: string, ...args: string[]) {
+export async function handlerAddFeed(cmdName: string, user: DbUser, ...args: string[]) {
   if (args.length !== 2) {
     throw new Error(`usage: ${cmdName} <feed_name> <url>`);
-  }
-
-  const config = readConfig();
-  const user = await getUser(config.currentUserName);
-
-  if (!user) {
-    throw new Error(`User ${config.currentUserName} not found`);
   }
 
   const feedName = args[0];
